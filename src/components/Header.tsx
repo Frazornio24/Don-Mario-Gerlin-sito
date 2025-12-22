@@ -35,8 +35,8 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled
-          ? "bg-primary/95 backdrop-blur-xl shadow-lg border-b border-secondary/20"
-          : "bg-primary/85 backdrop-blur-md border-b border-secondary/10"
+        ? "bg-primary/95 backdrop-blur-xl shadow-lg border-b border-secondary/20"
+        : "bg-primary/85 backdrop-blur-md border-b border-secondary/10"
         }`}
     >
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,39 +86,33 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Polished Solid Blue Dropdown */}
         <div
-          className={`lg:hidden fixed left-0 right-0 top-24 bg-primary/98 backdrop-blur-xl transition-all duration-500 shadow-2xl ${isMenuOpen
-              ? "opacity-100 pointer-events-auto translate-y-0"
-              : "opacity-0 pointer-events-none -translate-y-4"
+          className={`lg:hidden absolute left-0 right-0 top-24 bg-primary transition-all duration-300 shadow-2xl overflow-hidden ${isMenuOpen
+            ? "max-h-[80vh] opacity-100 translate-y-0"
+            : "max-h-0 opacity-0 -translate-y-4 pointer-events-none"
             }`}
-          style={{
-            maxHeight: "calc(100vh - 6rem)",
-            overflowY: "auto"
-          }}
         >
-          <ul className="flex flex-col py-6 px-6">
+          <ul className="flex flex-col py-6 px-6 space-y-2">
             {menuItems.map((item, index) => (
               <li
                 key={item.path}
-                className="w-full transition-all duration-300"
+                className="w-full"
                 style={{
-                  transform: isMenuOpen ? "translateX(0)" : "translateX(-20px)",
+                  transitionDelay: isMenuOpen ? `${index * 40}ms` : "0ms",
+                  transform: isMenuOpen ? "translateX(0)" : "translateX(-10px)",
                   opacity: isMenuOpen ? 1 : 0,
-                  transitionDelay: isMenuOpen ? `${index * 50}ms` : "0ms"
+                  transition: "all 0.3s ease-out"
                 }}
               >
                 <Link
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block px-8 py-4 rounded-xl text-xl font-bold transition-all duration-300
+                  className={`block px-6 py-4 rounded-xl text-xl font-bold transition-all duration-300
                     ${location.pathname === item.path
-                      ? "bg-secondary text-primary"
-                      : "text-primary-foreground hover:bg-secondary/15 hover:text-secondary"
+                      ? "bg-secondary text-primary shadow-md"
+                      : "text-primary-foreground hover:bg-secondary/10 hover:text-secondary"
                     }`}
-                  style={{
-                    textShadow: "0 1px 4px rgba(0, 0, 0, 0.5)"
-                  }}
                 >
                   {item.label}
                 </Link>
