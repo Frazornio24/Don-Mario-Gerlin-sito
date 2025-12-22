@@ -144,6 +144,60 @@ const Stampa = () => {
       tags: ["Anniversario", "Musica"],
       url: "https://www.qdpnews.it/comuni/pieve-di-soligo/103-anni-fa-nasceva-don-mario-gerlin-domani-sera-in-duomo-la-messa-in-suo-ricordo-ospite-deccezione-un-soprano-giapponese-dalla-fenice-di-venezia/",
     },
+    {
+      source: "QdP News",
+      date: "2 Aprile 2022",
+      title: "Assemblea Annuale Associazione",
+      description:
+        "\"Sabato 2 Aprile l'Assemblea annuale dell'Associazione Amici di Don Mario Gerlin: bilancio e nuovi progetti\"",
+      tags: ["Associazione", "Assemblea"],
+      url: "https://www.qdpnews.it/notizie-in-breve/02-04-sabato-2-aprile-lassemblea-annuale-dellassociazione-amici-di-don-mario-gerlin/",
+    },
+    {
+      source: "QdP News",
+      date: "28 Marzo 2022",
+      title: "Ricordo di Adriano Armelin",
+      description:
+        "\"Il commosso ricordo degli Amici di Don Mario Gerlin per Adriano Armelin: una vita dedicata al servizio\"",
+      tags: ["Memoria", "Servizio"],
+      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/martedi-alle-15-in-duomo-a-pieve-di-soligo-i-funerali-di-adriano-armelin-il-commosso-ricordo-degli-amici-di-don-mario-gerlin/",
+    },
+    {
+      source: "Treviso Today",
+      date: "24 Febbraio 2021",
+      title: "Nuova Presidenza Associazione",
+      description:
+        "\"Pierina Gerlin eletta nuova presidente dell'Associazione Amici di Don Mario Gerlin: continuità e innovazione\"",
+      tags: ["Associazione", "Nomina"],
+      url: "https://www.trevisotoday.it/info/amici-don-mario-gerlin-presidente-pieve-di-soligo-24-febbraio-2021.html",
+    },
+    {
+      source: "QdP News",
+      date: "27 Ottobre 2021",
+      title: "Messa in Ricordo di Don Mario",
+      description:
+        "\"Santa Messa in Duomo a Pieve di Soligo in ricordo di Don Mario Gerlin con la Piccola Orchestra Veneta\"",
+      tags: ["Memoria", "Anniversario"],
+      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/pieve-di-soligo-domani-in-duomo-la-santa-messa-in-ricordo-di-don-mario-gerlin-intervento-musicale-della-piccola-orchestra-veneta/",
+    },
+    {
+      source: "QdP News",
+      date: "5 Giugno 2021",
+      title: "Testimonianze per Francesco Fabbri",
+      description:
+        "\"Tante testimonianze per Francesco Fabbri: un esempio illustre di amore per la comunità e servizio al bene comune\"",
+      tags: ["Comunità", "Servizio"],
+      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/pieve-di-soligo-tante-testimonianze-per-francesco-fabbri-zabotti-esempio-illustre-di-amore-per-la-comunita-e-servizio-al-bene-comune/",
+    },
+    {
+      source: "QdP News",
+      date: "26 Febbraio 2021",
+      title: "Messa in Memoria",
+      description:
+        "\"Messa in memoria di Don Mario Gerlin: ricordate anche le preziose collaboratrici suor Carmela e suor Alberta\"",
+      tags: ["Memoria", "Collaborazione"],
+      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/pieve-di-soligo-questa-sera-in-duomo-la-messa-in-memoria-di-don-mario-gerlin-saranno-ricordate-anche-le-collaboratrici-suor-carmela-e-suor-alberta/",
+    },
   ];
 
   return (
