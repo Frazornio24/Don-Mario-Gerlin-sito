@@ -98,11 +98,13 @@ const HeroSection = () => {
 
       {/* Scroll Down Indicator */}
       <div
-        className="absolute bottom-5 left-1/2 transform -translate-x-1/2 z-30 animate-bounce cursor-pointer p-2"
+        className="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 cursor-pointer p-2"
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
         aria-label="Scorri giù"
       >
-        <ChevronDown className="text-white hover:text-secondary transition-colors duration-300 w-12 h-12 drop-shadow-md" />
+        <div className="animate-bounce">
+          <ChevronDown className="text-white hover:text-secondary transition-colors duration-300 w-12 h-12 drop-shadow-md" />
+        </div>
       </div>
     </section>
   );
