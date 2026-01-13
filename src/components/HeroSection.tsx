@@ -1,4 +1,7 @@
-import { useState, useEffect } from "react";
+import { useRef } from "react";
+import Autoplay from "embla-carousel-autoplay";
+import useEmblaCarousel from "embla-carousel-react";
+import { motion } from "framer-motion";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,13 +9,12 @@ import hero1 from "@/assets/hero1.jpg";
 import hero2 from "@/assets/hero2.jpg";
 import hero3 from "@/assets/hero3.jpg";
 
-/**
- * Hero Section Component
- * Slideshow automatico con overlay e call-to-action
- */
 const HeroSection = () => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const autoplay = useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: false })
+  );
+
+  const [emblaRef] = useEmblaCarousel({ loop: true, duration: 60 }, [autoplay.current]);
 
   const images = [
     { src: hero1, alt: "Missionario al servizio della comunità" },
@@ -20,65 +22,59 @@ const HeroSection = () => {
     { src: hero3, alt: "Preghiera e speranza" },
   ];
 
-  // Slideshow automatico
-  useEffect(() => {
-    setIsLoaded(true);
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [images.length]);
-
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Slideshow Background */}
-      <div className="absolute inset-0 z-0">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-2000 ${currentImageIndex === index ? "opacity-100" : "opacity-0"
-              }`}
-          >
-            <img
-              src={image.src}
-              alt={image.alt}
-              className="w-full h-full object-cover animate-[slideshow_8s_ease-in-out_infinite_alternate]"
-              style={{
-                filter: "brightness(0.4) contrast(1.1)",
-              }}
-            />
-          </div>
-        ))}
+      {/* Embla Carousel Background */}
+      <div className="absolute inset-0 z-0 h-full" ref={emblaRef}>
+        <div className="flex h-full">
+          {images.map((image, index) => (
+            <div className="relative flex-[0_0_100%] h-full min-w-0" key={index}>
+              <img
+                src={image.src}
+                alt={image.alt}
+                className="w-full h-full object-cover"
+                style={{
+                  filter: "brightness(0.4) contrast(1.1)",
+                }}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Overlay Gradient */}
       <div
-        className="absolute inset-0 z-10"
+        className="absolute inset-0 z-10 pointer-events-none"
         style={{
           background: "linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.4) 100%)",
         }}
       />
 
-      {/* Hero Content */}
-      <div
-        className={`relative z-20 container mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center items-center text-center
-          transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-      >
-        <h1 className="text-primary-foreground mb-6 leading-tight animate-slide-up">
+      {/* Hero Content with Framer Motion */}
+      <div className="relative z-20 container mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center items-center text-center">
+        <motion.h1
+          className="text-primary-foreground mb-6 leading-tight"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
           L'eredità di Don Mario Gerlin
-        </h1>
-        <p
-          className="text-xl md:text-2xl text-primary-foreground/90 mb-10 max-w-3xl 
-                    leading-relaxed animate-slide-up"
-          style={{ animationDelay: "0.2s" }}
+        </motion.h1>
+
+        <motion.p
+          className="text-xl md:text-2xl text-primary-foreground/90 mb-10 max-w-3xl leading-relaxed"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
         >
           Un impegno che continua attraverso le generazioni
-        </p>
-        <div
-          className="flex flex-col sm:flex-row gap-4 animate-scale-in"
-          style={{ animationDelay: "0.4s" }}
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.4, ease: "backOut" }}
+          className="flex flex-col sm:flex-row gap-4"
         >
           <Button
             asChild
@@ -91,10 +87,8 @@ const HeroSection = () => {
               <ChevronRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
-        </div>
+        </motion.div>
       </div>
-
-
 
       {/* Scroll Down Indicator */}
       <div
@@ -102,9 +96,12 @@ const HeroSection = () => {
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
         aria-label="Scorri giù"
       >
-        <div className="animate-bounce">
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
           <ChevronDown className="text-white hover:text-secondary transition-colors duration-300 w-12 h-12 drop-shadow-md" />
-        </div>
+        </motion.div>
       </div>
     </section>
   );

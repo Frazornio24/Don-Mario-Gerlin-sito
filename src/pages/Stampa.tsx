@@ -2,6 +2,7 @@ import { Download, FileText, Newspaper, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -202,6 +203,10 @@ const Stampa = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Rassegna Stampa e Documenti"
+        description="Archivio completo di articoli, pubblicazioni e documenti storici su Don Mario Gerlin e le attività dell'associazione."
+      />
       <Header />
       <main className="pt-20">
         {/* Hero Section */}

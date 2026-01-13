@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 /**
  * Contatti Page
@@ -50,6 +51,10 @@ const Contatti = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Contatti"
+        description="Entra in contatto con noi. Indirizzo, email e modulo per scrivere all'Associazione Amici di Don Mario Gerlin."
+      />
       <Header />
       <main className="pt-20">
         {/* Hero Section */}

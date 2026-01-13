@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScuolaElementare from "@/assets/scuola.jpg";
 import Ospedale from "@/assets/ospedale.jpg";
+import SEO from "@/components/SEO";
 
 /**
  * Bambui Page
@@ -67,6 +68,10 @@ const Bambui = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Bambuí | Il Cuore della Missione"
+        description="Scopri la missione a Bambuí: ospedale, scuola e opere realizzate grazie al sostegno dell'Associazione e alla dedizione di Don Mario."
+      />
       <Header />
       <main className="pt-20">
         {/* Hero Section */}

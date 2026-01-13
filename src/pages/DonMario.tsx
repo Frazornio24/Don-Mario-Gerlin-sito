@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Calendar } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 
 /**
  * Don Mario Page
@@ -85,6 +86,10 @@ const DonMario = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Don Mario Gerlin | Apostolo dei Lebbrosi"
+        description="Biografia e timeline della vita di Don Mario Gerlin (1919-1993), il missionario trevigiano dedicato ai lebbrosi del Brasile."
+      />
       <Header />
       <main className="pt-20">
         {/* Hero Section */}

@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
+import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import ChiSiamo from "./pages/ChiSiamo";
 import DonMario from "./pages/DonMario";
@@ -18,26 +20,29 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/chi-siamo" element={<ChiSiamo />} />
-          <Route path="/don-mario" element={<DonMario />} />
-          <Route path="/bambui" element={<Bambui />} />
-          <Route path="/stampa" element={<Stampa />} />
-          <Route path="/foto" element={<Foto />} />
-          <Route path="/contatti" element={<Contatti />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          {/* Admin Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <HelmetProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/chi-siamo" element={<ChiSiamo />} />
+            <Route path="/don-mario" element={<DonMario />} />
+            <Route path="/bambui" element={<Bambui />} />
+            <Route path="/stampa" element={<Stampa />} />
+            <Route path="/foto" element={<Foto />} />
+            <Route path="/contatti" element={<Contatti />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Admin Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </HelmetProvider>
   </QueryClientProvider>
 );
 

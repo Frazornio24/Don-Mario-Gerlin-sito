@@ -4,6 +4,7 @@ import { Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import {
   Dialog,
   DialogContent,
@@ -142,6 +143,10 @@ const Foto = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Galleria Fotografica"
+        description="Immagini storiche e recenti che raccontano la missione, gli eventi e la vita della comunità di Bambuí e dell'Associazione."
+      />
       <Header />
       <main className="pt-20">
         {/* Hero Section */}

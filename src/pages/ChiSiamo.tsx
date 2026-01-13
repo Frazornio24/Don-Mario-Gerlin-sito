@@ -3,6 +3,7 @@ import { BookOpen, Heart, Users, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import heroImage from "@/assets/hero2.jpg";
 
 /**
@@ -63,6 +64,10 @@ const ChiSiamo = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Chi Siamo"
+        description="La storia dell'Associazione Amici di Don Mario Gerlin: dal 1994, portiamo avanti l'eredità di amore e servizio del missionario trevigiano."
+      />
       <Header />
       <main>
         {/* Hero Section with Parallax Effect */}
