@@ -30,28 +30,22 @@ const Foto = () => {
   ];
 
   // Funzione per caricare dinamicamente le foto dalla cartella assets/gallery
-  // Formato file atteso: categoria-descrizione.jpg (es: missione-viaggio_in_brasile.jpg)
+  // Formato file atteso: category/filename.jpg
   const loadGalleryImages = () => {
     try {
       // @ts-ignore - Vite specific feature
-      const glob = import.meta.glob('@/assets/gallery/*.{png,jpg,jpeg,webp}', { eager: true });
+      // Load all images recursively from subdirectories
+      const glob = import.meta.glob('@/assets/gallery/*/*.{png,jpg,jpeg,webp}', { eager: true });
 
       return Object.entries(glob).map(([path, module]: [string, any]) => {
-        // Estrai nome file
-        const filename = path.split('/').pop()?.split('.')[0] || "";
+        // path is like "/src/assets/gallery/category/filename.jpg"
+        const parts = path.split('/');
+        const filename = parts.pop()?.split('.')[0] || ""; // Remove extension
+        const folder = parts.pop(); // The folder name (category)
 
-        // Estrai categoria e caption dal nome file
-        // Es: "missione-viaggio_2023" -> category: "missione", caption: "viaggio 2023"
-        const parts = filename.split('-');
-        let category = "varie";
-        let caption = filename.replace(/_/g, ' ');
-
-        const knownCategories = ["missione", "bambui", "eventi", "persone"];
-
-        if (parts.length > 1 && knownCategories.includes(parts[0].toLowerCase())) {
-          category = parts[0].toLowerCase();
-          caption = parts.slice(1).join(' ').replace(/_/g, ' ');
-        }
+        let category = folder?.toLowerCase() || "varie";
+        // Clean up caption: remove hyphens/underscores/extension
+        let caption = filename.replace(/[-_]/g, ' ');
 
         return {
           url: module.default,
@@ -85,57 +79,14 @@ const Foto = () => {
 
   const dynamicPhotos = loadGalleryImages();
 
-  // Foto statiche di esempio (verranno mostrate se non ci sono foto nella cartella o insieme ad esse)
-  const staticPhotos = [
-    {
-      url: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&h=600&fit=crop",
-      caption: "Don Mario con la comunità",
-      category: "missione",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop",
-      caption: "Scuola a Bambuí",
-      category: "bambui",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=600&fit=crop",
-      caption: "Celebrazione commemorativa",
-      category: "eventi",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&h=600&fit=crop",
-      caption: "Momento di preghiera",
-      category: "missione",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600&fit=crop",
-      caption: "Ospedale",
-      category: "bambui",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600&fit=crop",
-      caption: "Incontro con i fedeli",
-      category: "persone",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop",
-      caption: "Testimonianze di fede",
-      category: "eventi",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800&h=600&fit=crop",
-      caption: "Comunità unita",
-      category: "persone",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop",
-      caption: "Opera missionaria",
-      category: "missione",
-    },
-  ];
+  /* 
+   * Foto statiche rimosse come richiesto.
+   * Le foto vengono caricate solo dalla cartella assets/gallery (dynamicPhotos) 
+   * e dal database (customPhotos).
+   */
 
-  // Unisci foto dinamiche (file), custom (admin), e statiche
-  const photos = [...dynamicPhotos, ...customPhotos, ...staticPhotos];
+  // Unisci foto dinamiche (file) e custom (admin)
+  const photos = [...dynamicPhotos, ...customPhotos];
 
 
   const filteredPhotos =

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Trash2, Image as ImageIcon, FileText, LogOut, Save, Eye, Check, X } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon, FileText, LogOut, Save, Eye, Check, X, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -40,11 +40,17 @@ const Admin = () => {
     // State per Foto
     const [photos, setPhotos] = useState<CustomPhoto[]>([]);
     const [newPhoto, setNewPhoto] = useState({ url: "", caption: "", category: "missione" });
+    const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
+    const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
     const [showPhotoPreview, setShowPhotoPreview] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+
 
     // State per Documenti
     const [documents, setDocuments] = useState<CustomDocument[]>([]);
     const [newDoc, setNewDoc] = useState({ title: "", description: "", url: "" });
+    const [selectedDocFile, setSelectedDocFile] = useState<File | null>(null);
+    const [editingDocId, setEditingDocId] = useState<string | null>(null);
     const [showDocPreview, setShowDocPreview] = useState(false);
 
     useEffect(() => {
@@ -86,116 +92,254 @@ const Admin = () => {
 
     // --- Gestione Foto ---
     const openPhotoPreview = () => {
-        if (!newPhoto.url || !newPhoto.caption) {
-            toast({ title: "Errore", description: "Compila tutti i campi prima di visualizzare l'anteprima", variant: "destructive" });
+        if (!newPhoto.caption) {
+            toast({ title: "Errore", description: "Inserisci almeno una didascalia", variant: "destructive" });
             return;
+        }
+        if (!newPhoto.url && !selectedPhotoFile) {
+             toast({ title: "Errore", description: "Seleziona una foto o inserisci un URL", variant: "destructive" });
+             return;
         }
         setShowPhotoPreview(true);
     };
 
-    const handleAddPhoto = async () => {
-        if (!newPhoto.url || !newPhoto.caption) {
-            toast({ title: "Errore", description: "Compila tutti i campi", variant: "destructive" });
+    const handleSavePhoto = async () => {
+        setIsUploading(true);
+        let finalUrl = newPhoto.url;
+
+        // Upload new file only if selected
+        if (selectedPhotoFile) {
+            const fileExt = selectedPhotoFile.name.split('.').pop();
+            const fileName = `${Date.now()}.${fileExt}`;
+            const { error: uploadError } = await supabase.storage
+                .from('gallery')
+                .upload(fileName, selectedPhotoFile);
+
+            if (uploadError) {
+                toast({ title: "Errore Upload", description: uploadError.message, variant: "destructive" });
+                setIsUploading(false);
+                return;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('gallery')
+                .getPublicUrl(fileName);
+            
+            finalUrl = publicUrl;
+        }
+
+        if (!finalUrl || !newPhoto.caption) {
+            toast({ title: "Errore", description: "Dati mancanti", variant: "destructive" });
+            setIsUploading(false);
             return;
         }
 
-        const { data, error } = await supabase
-            .from('photos')
-            .insert([{
-                url: newPhoto.url,
-                caption: newPhoto.caption,
-                category: newPhoto.category
-            }])
-            .select();
+        if (editingPhotoId) {
+            // UPDATE
+            const { error } = await supabase
+                .from('photos')
+                .update({
+                    url: finalUrl,
+                    caption: newPhoto.caption,
+                    category: newPhoto.category
+                })
+                .eq('id', editingPhotoId);
 
-        if (error) {
-            toast({ title: "Errore", description: "Errore durante il salvataggio: " + error.message, variant: "destructive" });
-            return;
-        }
+            if (error) {
+                toast({ title: "Errore Aggiornamento", description: error.message, variant: "destructive" });
+            } else {
+                setPhotos(photos.map(p => p.id === editingPhotoId ? { ...p, url: finalUrl, caption: newPhoto.caption, category: newPhoto.category } : p));
+                toast({ title: "Foto Aggiornata", description: "Modifiche salvate con successo." });
+                resetPhotoForm();
+            }
+        } else {
+            // INSERT
+            const { data, error } = await supabase
+                .from('photos')
+                .insert([{
+                    url: finalUrl,
+                    caption: newPhoto.caption,
+                    category: newPhoto.category
+                }])
+                .select();
 
-        if (data) {
-            setPhotos([data[0], ...photos]);
-            setNewPhoto({ url: "", caption: "", category: "missione" });
-            setShowPhotoPreview(false);
-            toast({ title: "Foto Aggiunta", description: "La foto è ora visibile nella galleria." });
+            if (error) {
+                toast({ title: "Errore Salvataggio", description: error.message, variant: "destructive" });
+            } else if (data) {
+                setPhotos([data[0], ...photos]);
+                toast({ title: "Foto Aggiunta", description: "La foto è ora visibile nella galleria." });
+                resetPhotoForm();
+            }
         }
+        setIsUploading(false);
     };
 
-    const handleDeletePhoto = async (id: string) => {
-        const { error } = await supabase
-            .from('photos')
-            .delete()
-            .eq('id', id);
+    const resetPhotoForm = () => {
+        setNewPhoto({ url: "", caption: "", category: "missione" });
+        setSelectedPhotoFile(null);
+        setEditingPhotoId(null);
+        setShowPhotoPreview(false);
+    };
 
-        if (error) {
-            toast({ title: "Errore", description: "Impossibile eliminare: " + error.message, variant: "destructive" });
-        } else {
-            setPhotos(photos.filter(p => p.id !== id));
+    const startEditingPhoto = (photo: CustomPhoto) => {
+        setNewPhoto({ url: photo.url, caption: photo.caption, category: photo.category });
+        setSelectedPhotoFile(null);
+        setEditingPhotoId(photo.id);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleDeletePhoto = async (id: string, url: string) => {
+        if (confirm("Sei sicuro di voler eliminare questa foto?")) {
+            const { error } = await supabase
+                .from('photos')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                toast({ title: "Errore", description: "Impossibile eliminare: " + error.message, variant: "destructive" });
+            } else {
+                setPhotos(photos.filter(p => p.id !== id));
+                if (url.includes('/storage/v1/object/public/gallery/')) {
+                    const fileName = url.split('/').pop();
+                    if (fileName) {
+                        await supabase.storage.from('gallery').remove([fileName]);
+                    }
+                }
+                if (editingPhotoId === id) resetPhotoForm();
+            }
         }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'photo' | 'doc') => {
         const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (type === 'photo') {
-                    setNewPhoto({ ...newPhoto, url: reader.result as string });
-                } else {
-                    setNewDoc({ ...newDoc, url: reader.result as string });
-                }
-            };
-            reader.readAsDataURL(file);
+            if (type === 'photo') {
+                setSelectedPhotoFile(file);
+                // Create object URL for preview
+                setNewPhoto({ ...newPhoto, url: URL.createObjectURL(file) });
+            } else {
+                setSelectedDocFile(file);
+                setNewDoc({ ...newDoc, url: URL.createObjectURL(file) });
+            }
         }
     };
 
     // --- Gestione Documenti ---
     const openDocPreview = () => {
-        if (!newDoc.title || !newDoc.description || !newDoc.url) {
-            toast({ title: "Errore", description: "Compila tutti i campi prima di visualizzare l'anteprima", variant: "destructive" });
+         if (!newDoc.title || !newDoc.description) {
+            toast({ title: "Errore", description: "Compila titolo e descrizione", variant: "destructive" });
             return;
+        }
+        if (!newDoc.url && !selectedDocFile) {
+             toast({ title: "Errore", description: "Seleziona un documento o inserisci un URL", variant: "destructive" });
+             return;
         }
         setShowDocPreview(true);
     };
 
-    const handleAddDoc = async () => {
-        if (!newDoc.title || !newDoc.description || !newDoc.url) {
-            toast({ title: "Errore", description: "Compila tutti i campi", variant: "destructive" });
-            return;
+    const handleSaveDoc = async () => {
+        setIsUploading(true);
+        let finalUrl = newDoc.url;
+
+        if (selectedDocFile) {
+            const fileExt = selectedDocFile.name.split('.').pop();
+            const fileName = `${Date.now()}.${fileExt}`;
+            const { error: uploadError } = await supabase.storage
+                .from('documents')
+                .upload(fileName, selectedDocFile);
+
+            if (uploadError) {
+                toast({ title: "Errore Upload", description: uploadError.message, variant: "destructive" });
+                setIsUploading(false);
+                return;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('documents')
+                .getPublicUrl(fileName);
+            
+            finalUrl = publicUrl;
         }
 
-        const { data, error } = await supabase
-            .from('documents')
-            .insert([{
-                title: newDoc.title,
-                description: newDoc.description,
-                url: newDoc.url
-            }])
-            .select();
-
-        if (error) {
-            toast({ title: "Errore", description: "Errore salvataggio documento: " + error.message, variant: "destructive" });
-            return;
+        if (!finalUrl || !newDoc.title || !newDoc.description) {
+             toast({ title: "Errore", description: "Compila tutti i campi", variant: "destructive" });
+             setIsUploading(false);
+             return;
         }
 
-        if (data) {
-            setDocuments([data[0], ...documents]);
-            setNewDoc({ title: "", description: "", url: "" });
-            setShowDocPreview(false);
-            toast({ title: "Documento Aggiunto", description: "Il documento è ora visibile nella pagina stampa." });
+        if (editingDocId) {
+            // UPDATE
+            const { error } = await supabase
+                .from('documents')
+                .update({
+                    title: newDoc.title,
+                    description: newDoc.description,
+                    url: finalUrl
+                })
+                .eq('id', editingDocId);
+
+            if (error) {
+                toast({ title: "Errore Aggiornamento", description: error.message, variant: "destructive" });
+            } else {
+                setDocuments(documents.map(d => d.id === editingDocId ? { ...d, title: newDoc.title, description: newDoc.description, url: finalUrl } : d));
+                toast({ title: "Documento Aggiornato", description: "Modifiche salvate." });
+                resetDocForm();
+            }
+        } else {
+            // INSERT
+            const { data, error } = await supabase
+                .from('documents')
+                .insert([{
+                    title: newDoc.title,
+                    description: newDoc.description,
+                    url: finalUrl
+                }])
+                .select();
+
+            if (error) {
+                toast({ title: "Errore Salvataggio", description: "Errore salvataggio: " + error.message, variant: "destructive" });
+            } else if (data) {
+                setDocuments([data[0], ...documents]);
+                toast({ title: "Documento Aggiunto", description: "Visibile nella pagina Articoli." });
+                resetDocForm();
+            }
         }
+        setIsUploading(false);
     };
 
-    const handleDeleteDoc = async (id: string) => {
-        const { error } = await supabase
-            .from('documents')
-            .delete()
-            .eq('id', id);
+    const resetDocForm = () => {
+        setNewDoc({ title: "", description: "", url: "" });
+        setSelectedDocFile(null);
+        setEditingDocId(null);
+        setShowDocPreview(false);
+    };
 
-        if (error) {
-            toast({ title: "Errore", description: "Impossibile eliminare: " + error.message, variant: "destructive" });
-        } else {
-            setDocuments(documents.filter(d => d.id !== id));
+    const startEditingDoc = (doc: CustomDocument) => {
+        setNewDoc({ title: doc.title, description: doc.description, url: doc.url });
+        setSelectedDocFile(null);
+        setEditingDocId(doc.id);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleDeleteDoc = async (id: string, url: string) => {
+        if (confirm("Sei sicuro di voler eliminare questo documento??")) {
+            const { error } = await supabase
+                .from('documents')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                toast({ title: "Errore", description: "Impossibile eliminare: " + error.message, variant: "destructive" });
+            } else {
+                setDocuments(documents.filter(d => d.id !== id));
+                if (url.includes('/storage/v1/object/public/documents/')) {
+                    const fileName = url.split('/').pop();
+                    if (fileName) {
+                        await supabase.storage.from('documents').remove([fileName]);
+                    }
+                }
+                if (editingDocId === id) resetDocForm();
+            }
         }
     };
 
@@ -210,18 +354,20 @@ const Admin = () => {
                     </Button>
                 </div>
 
-                <Tabs defaultValue="foto" className="w-full">
+                    <Tabs defaultValue="foto" className="w-full">
                     <TabsList className="grid w-full grid-cols-2 mb-8 h-12">
                         <TabsTrigger value="foto" className="text-lg">Gestione Foto</TabsTrigger>
-                        <TabsTrigger value="stampa" className="text-lg">Gestione Stampa</TabsTrigger>
+                        <TabsTrigger value="articoli" className="text-lg">Gestione Articoli</TabsTrigger>
                     </TabsList>
 
                     {/* TAB FOTO */}
                     <TabsContent value="foto" className="space-y-6">
-                        <Card>
+                        <Card className={editingPhotoId ? "border-2 border-primary shadow-lg" : ""}>
                             <CardHeader>
-                                <CardTitle>Aggiungi Nuova Foto</CardTitle>
-                                <CardDescription>Carica una nuova foto per la galleria.</CardDescription>
+                                <CardTitle>{editingPhotoId ? "Modifica Foto" : "Aggiungi Nuova Foto"}</CardTitle>
+                                <CardDescription>
+                                    {editingPhotoId ? "Modifica i dettagli o sostituisci l'immagine." : "Carica una nuova foto per la galleria."}
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid md:grid-cols-2 gap-4">
@@ -248,7 +394,7 @@ const Admin = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Immagine</Label>
+                                    <Label>Immagine {editingPhotoId && "(Lascia vuoto per mantenere l'attuale)"}</Label>
                                     <div className="flex gap-4">
                                         <Input
                                             type="file"
@@ -263,39 +409,58 @@ const Admin = () => {
                                         />
                                     </div>
                                 </div>
-                                <Button onClick={openPhotoPreview} className="w-full gradient-gold">
-                                    <Eye className="mr-2 h-4 w-4" /> Anteprima Foto
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Button onClick={openPhotoPreview} className="flex-1 gradient-gold" disabled={isUploading}>
+                                        {isUploading ? "Elaborazione..." : (editingPhotoId ? <><Save className="mr-2 h-4 w-4" /> Salva Modifiche</> : <><Eye className="mr-2 h-4 w-4" /> Anteprima Foto</>)}
+                                    </Button>
+                                    {editingPhotoId && (
+                                        <Button variant="outline" onClick={resetPhotoForm} disabled={isUploading}>
+                                            Annulla
+                                        </Button>
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
 
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {photos.map(photo => (
-                                <div key={photo.id} className="relative group rounded-xl overflow-hidden border bg-card">
+                                <div key={photo.id} className={`relative group rounded-xl overflow-hidden border bg-card ${editingPhotoId === photo.id ? "ring-2 ring-primary" : ""}`}>
                                     <img src={photo.url} alt={photo.caption} className="w-full h-48 object-cover" />
                                     <div className="p-3">
                                         <p className="font-semibold truncate">{photo.caption}</p>
                                         <p className="text-xs text-muted-foreground capitalize">{photo.category}</p>
                                     </div>
-                                    <Button
-                                        variant="destructive"
-                                        size="icon"
-                                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={() => handleDeletePhoto(photo.id)}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                    <div className="absolute top-2 right-2 flex gap-1">
+                                        <Button
+                                            variant="secondary"
+                                            size="icon"
+                                            className="h-8 w-8 bg-white/90 hover:bg-white text-primary shadow-sm"
+                                            onClick={() => startEditingPhoto(photo)}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="icon"
+                                            className="h-8 w-8 shadow-sm"
+                                            onClick={() => handleDeletePhoto(photo.id, photo.url)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </TabsContent>
 
-                    {/* TAB STAMPA */}
-                    <TabsContent value="stampa" className="space-y-6">
-                        <Card>
+                    {/* TAB ARTICOLI */}
+                    <TabsContent value="articoli" className="space-y-6">
+                        <Card className={editingDocId ? "border-2 border-primary shadow-lg" : ""}>
                             <CardHeader>
-                                <CardTitle>Aggiungi Documento</CardTitle>
-                                <CardDescription>Aggiungi un nuovo articolo o documento PDF.</CardDescription>
+                                <CardTitle>{editingDocId ? "Modifica Documento" : "Aggiungi Documento"}</CardTitle>
+                                <CardDescription>
+                                    {editingDocId ? "Modifica i dettagli o sostituisci il file." : "Aggiungi un nuovo articolo o documento PDF."}
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid md:grid-cols-2 gap-4">
@@ -317,22 +482,29 @@ const Admin = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>File (PDF o Immagine) o Link</Label>
+                                    <Label>File (PDF o Immagine) {editingDocId && "(Lascia vuoto per mantenere l'attuale)"}</Label>
                                     <Input
                                         type="file"
                                         accept=".pdf,image/*"
                                         onChange={(e) => handleFileChange(e, 'doc')}
                                     />
                                 </div>
-                                <Button onClick={openDocPreview} className="w-full gradient-gold">
-                                    <Eye className="mr-2 h-4 w-4" /> Anteprima Documento
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Button onClick={openDocPreview} className="flex-1 gradient-gold" disabled={isUploading}>
+                                        {isUploading ? "Elaborazione..." : (editingDocId ? <><Save className="mr-2 h-4 w-4" /> Salva Modifiche</> : <><Eye className="mr-2 h-4 w-4" /> Anteprima Documento</>)}
+                                    </Button>
+                                     {editingDocId && (
+                                        <Button variant="outline" onClick={resetDocForm} disabled={isUploading}>
+                                            Annulla
+                                        </Button>
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
 
                         <div className="space-y-4">
                             {documents.map(doc => (
-                                <div key={doc.id} className="flex items-center justify-between p-4 rounded-xl border bg-card hover:shadow-md transition-all">
+                                <div key={doc.id} className={`flex items-center justify-between p-4 rounded-xl border bg-card hover:shadow-md transition-all ${editingDocId === doc.id ? "border-primary bg-primary/5" : ""}`}>
                                     <div className="flex items-center gap-4">
                                         <div className="p-2 bg-primary/10 rounded-lg">
                                             <FileText className="h-6 w-6 text-primary" />
@@ -342,14 +514,23 @@ const Admin = () => {
                                             <p className="text-sm text-muted-foreground">{doc.description}</p>
                                         </div>
                                     </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                        onClick={() => handleDeleteDoc(doc.id)}
-                                    >
-                                        <Trash2 className="h-5 w-5" />
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => startEditingDoc(doc)}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                            onClick={() => handleDeleteDoc(doc.id, doc.url)}
+                                        >
+                                            <Trash2 className="h-5 w-5" />
+                                        </Button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -397,8 +578,8 @@ const Admin = () => {
                         <Button variant="outline" onClick={() => setShowPhotoPreview(false)}>
                             <X className="mr-2 h-4 w-4" /> Modifica
                         </Button>
-                        <Button onClick={handleAddPhoto} className="gradient-gold">
-                            <Check className="mr-2 h-4 w-4" /> Conferma e Salva
+                        <Button onClick={handleSavePhoto} className="gradient-gold" disabled={isUploading}>
+                            {isUploading ? "Salvataggio..." : <><Check className="mr-2 h-4 w-4" /> {editingPhotoId ? "Salva Modifiche" : "Conferma e Salva"}</>}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -410,7 +591,7 @@ const Admin = () => {
                     <DialogHeader>
                         <DialogTitle>Anteprima Documento</DialogTitle>
                         <DialogDescription>
-                            Ecco come apparirà il documento nella pagina Stampa. Conferma per salvare o modifica per tornare al form.
+                            Ecco come apparirà il documento nella pagina Articoli. Conferma per salvare o modifica per tornare al form.
                         </DialogDescription>
                     </DialogHeader>
                     
@@ -438,8 +619,8 @@ const Admin = () => {
                         <Button variant="outline" onClick={() => setShowDocPreview(false)}>
                             <X className="mr-2 h-4 w-4" /> Modifica
                         </Button>
-                        <Button onClick={handleAddDoc} className="gradient-gold">
-                            <Check className="mr-2 h-4 w-4" /> Conferma e Salva
+                        <Button onClick={handleSaveDoc} className="gradient-gold" disabled={isUploading}>
+                            {isUploading ? "Salvataggio..." : <><Check className="mr-2 h-4 w-4" /> {editingDocId ? "Salva Modifiche" : "Conferma e Salva"}</>}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

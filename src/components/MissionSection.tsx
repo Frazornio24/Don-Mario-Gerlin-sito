@@ -54,9 +54,9 @@ const MissionSection = () => {
     },
     {
       icon: Users,
-      title: "Sostegno alle Comunità Locali",
-      description: "Supportiamo concretamente chi ha più bisogno",
-      path: "/stampa",
+      title: "Articoli e Documenti",
+      description: "Documentazione storica e rassegna stampa",
+      path: "/articoli",
     },
   ];
 

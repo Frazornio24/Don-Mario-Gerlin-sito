@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/dialog";
 
 /**
- * Stampa Page
+ * Articoli Page
  * Rassegna stampa e documenti
  */
-const Stampa = () => {
+const Articoli = () => {
   const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
   const [customDocs, setCustomDocs] = useState<any[]>([]);
 
@@ -204,7 +204,7 @@ const Stampa = () => {
   return (
     <div className="min-h-screen">
       <SEO
-        title="Rassegna Stampa e Documenti"
+        title="Articoli e Documenti"
         description="Archivio completo di articoli, pubblicazioni e documenti storici su Don Mario Gerlin e le attività dell'associazione."
       />
       <Header />
@@ -212,7 +212,7 @@ const Stampa = () => {
         {/* Hero Section */}
         <section className="py-20 md:py-32 bg-gradient-to-br from-primary via-primary-light to-primary">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-primary-foreground mb-6 animate-slide-up">Rassegna Stampa</h1>
+            <h1 className="text-primary-foreground mb-6 animate-slide-up">Articoli e Documenti</h1>
             <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-3xl mx-auto animate-slide-up">
               L'eredità di Don Mario attraverso i media e la documentazione storica
             </p>
@@ -342,4 +342,4 @@ const Stampa = () => {
   );
 };
 
-export default Stampa;
+export default Articoli;

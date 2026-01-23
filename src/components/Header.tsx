@@ -27,7 +27,7 @@ const Header = () => {
     { label: "Chi Siamo", path: "/chi-siamo" },
     { label: "Don Mario", path: "/don-mario" },
     { label: "Bambui", path: "/bambui" },
-    { label: "Stampa", path: "/stampa" },
+    { label: "Articoli", path: "/articoli" },
     { label: "Foto", path: "/foto" },
     { label: "Contatti", path: "/contatti" },
   ];

@@ -18,9 +18,9 @@ const PageOverviewSection = () => {
     },
     {
       icon: BookOpen,
-      title: "Pubblicazioni",
-      description: "Libri e materiali sulla vita di Don Mario.",
-      path: "/stampa",
+      title: "Articoli",
+      description: "Libri, articoli e materiali sulla vita di Don Mario.",
+      path: "/articoli",
     },
     {
       icon: MapPin,

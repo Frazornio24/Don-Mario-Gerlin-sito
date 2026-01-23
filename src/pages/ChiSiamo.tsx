@@ -56,9 +56,9 @@ const ChiSiamo = () => {
   const features = [
     {
       icon: BookOpen,
-      title: "Pubblicazioni",
-      description: "Scopri i libri e i materiali didattici che raccontano la vita straordinaria di Don Mario.",
-      path: "/stampa",
+      title: "Articoli e Pubblicazioni",
+      description: "Scopri i libri, gli articoli e i materiali didattici che raccontano la vita straordinaria di Don Mario.",
+      path: "/articoli",
     },
   ];
 
@@ -140,7 +140,7 @@ const ChiSiamo = () => {
                   <div className="absolute -inset-4 bg-gradient-to-tr from-secondary/20 to-primary/20 rounded-[2rem] blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/50">
                     <img
-                      src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&h=1000&fit=crop"
+                      src={heroImage}
                       alt="Storia dell'associazione"
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                     />
