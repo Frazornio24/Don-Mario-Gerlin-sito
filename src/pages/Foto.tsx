@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,6 +9,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogClose,
 } from "@/components/ui/dialog";
 
 /**
@@ -17,9 +18,7 @@ import {
  */
 const Foto = () => {
   const [activeFilter, setActiveFilter] = useState("tutti");
-  const [selectedPhoto, setSelectedPhoto] = useState<{ url: string; caption: string } | null>(
-    null
-  );
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   const filters = [
     { id: "tutti", label: "Tutte le Foto" },
@@ -43,9 +42,9 @@ const Foto = () => {
         const filename = parts.pop()?.split('.')[0] || ""; // Remove extension
         const folder = parts.pop(); // The folder name (category)
 
-        let category = folder?.toLowerCase() || "varie";
+        const category = folder?.toLowerCase() || "varie";
         // Clean up caption: remove hyphens/underscores/extension
-        let caption = filename.replace(/[-_]/g, ' ');
+        const caption = filename.replace(/[-_]/g, ' ');
 
         return {
           url: module.default,
@@ -61,7 +60,6 @@ const Foto = () => {
 
   const [customPhotos, setCustomPhotos] = useState<any[]>([]);
 
-  // Load custom photos from admin panel (Local Storage)
   // Load custom photos from admin panel (Supabase)
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -91,6 +89,67 @@ const Foto = () => {
 
   const filteredPhotos =
     activeFilter === "tutti" ? photos : photos.filter((photo) => photo.category === activeFilter);
+  
+  const handlePrev = useCallback(() => {
+    setSelectedPhotoIndex((prev) => {
+      if (prev === null) return null;
+      return prev === 0 ? filteredPhotos.length - 1 : prev - 1;
+    });
+  }, [filteredPhotos.length]);
+
+  const handleNext = useCallback(() => {
+    setSelectedPhotoIndex((prev) => {
+      if (prev === null) return null;
+      return prev === filteredPhotos.length - 1 ? 0 : prev + 1;
+    });
+  }, [filteredPhotos.length]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedPhotoIndex === null) return;
+      
+      if (e.key === "ArrowLeft") {
+        handlePrev();
+      } else if (e.key === "ArrowRight") {
+        handleNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedPhotoIndex, handleNext, handlePrev]);
+
+  // Swipe handlers
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      handleNext();
+    } else if (isRightSwipe) {
+      handlePrev();
+    }
+  };
+
+  const selectedPhoto = selectedPhotoIndex !== null ? filteredPhotos[selectedPhotoIndex] : null;
 
   return (
     <div className="min-h-screen">
@@ -138,7 +197,7 @@ const Foto = () => {
               {filteredPhotos.map((photo, index) => (
                 <div
                   key={index}
-                  onClick={() => setSelectedPhoto(photo)}
+                  onClick={() => setSelectedPhotoIndex(index)}
                   className="group relative rounded-3xl overflow-hidden shadow-elegant 
                            hover:shadow-xl transition-all duration-500 border-4 border-secondary 
                            hover:scale-105 cursor-pointer animate-scale-in"
@@ -179,20 +238,65 @@ const Foto = () => {
       <Footer />
 
       <Dialog
-        open={!!selectedPhoto}
-        onOpenChange={(open) => !open && setSelectedPhoto(null)}
+        open={selectedPhotoIndex !== null}
+        onOpenChange={(open) => !open && setSelectedPhotoIndex(null)}
       >
-        <DialogContent className="max-w-5xl bg-transparent border-none shadow-none p-0 text-white">
+        <DialogContent 
+          className="max-w-7xl w-full h-full md:h-auto md:max-h-[95vh] bg-transparent border-none shadow-none p-0 text-white flex items-center justify-center outline-none [&>button]:hidden"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
           <DialogTitle className="sr-only">{selectedPhoto?.caption}</DialogTitle>
-          <div className="relative w-full h-full flex flex-col items-center justify-center">
-            <img
-              src={selectedPhoto?.url}
-              alt={selectedPhoto?.caption}
-              className="max-h-[85vh] w-auto rounded-lg shadow-2xl"
-            />
-            <p className="mt-4 text-xl font-semibold text-center drop-shadow-md">
-              {selectedPhoto?.caption}
-            </p>
+          
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close button - custom positioned */}
+            <DialogClose className="absolute right-4 top-4 md:-right-12 md:-top-12 z-50 rounded-full bg-black/50 p-2 hover:bg-black/70 transition-colors text-white">
+              <X className="h-6 w-6" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+
+            {/* Navigation Buttons (Desktop) */}
+            <button
+               onClick={(e) => {
+                 e.stopPropagation();
+                 handlePrev();
+               }}
+               className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-50 
+                          bg-black/30 hover:bg-black/60 p-3 rounded-full 
+                          transition-all duration-300 transform hover:scale-110"
+               aria-label="Previous photo"
+            >
+              <ChevronLeft className="h-8 w-8 text-white" />
+            </button>
+
+            <button
+               onClick={(e) => {
+                 e.stopPropagation();
+                 handleNext();
+               }}
+               className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-50 
+                          bg-black/30 hover:bg-black/60 p-3 rounded-full 
+                          transition-all duration-300 transform hover:scale-110"
+               aria-label="Next photo"
+            >
+              <ChevronRight className="h-8 w-8 text-white" />
+            </button>
+
+            {/* Image Container */}
+            <div className="flex flex-col items-center justify-center max-w-full">
+              <img
+                src={selectedPhoto?.url}
+                alt={selectedPhoto?.caption}
+                className="max-h-[85vh] w-auto max-w-full object-contain rounded-lg shadow-2xl select-none"
+              />
+              <p className="mt-4 text-xl font-semibold text-center drop-shadow-md px-4">
+                {selectedPhoto?.caption}
+              </p>
+              <p className="text-sm text-white/70 mt-2">
+                {selectedPhotoIndex !== null && `${selectedPhotoIndex + 1} / ${filteredPhotos.length}`}
+              </p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

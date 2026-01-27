@@ -86,7 +86,6 @@ const Admin = () => {
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
-        sessionStorage.removeItem("isAdmin");
         navigate("/login");
     };
 
@@ -210,9 +209,49 @@ const Admin = () => {
         }
     };
 
+    const validateFile = (file: File, type: 'photo' | 'doc'): string | null => {
+        // Check file size (max 5MB for photos, 10MB for documents)
+        const maxSize = type === 'photo' ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            return `File troppo grande. Max: ${type === 'photo' ? '5MB' : '10MB'}`;
+        }
+
+        // Check file type
+        if (type === 'photo') {
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                return 'Tipo file non consentito. Usa: JPG, PNG, WebP';
+            }
+        } else {
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                return 'Tipo file non consentito. Usa: PDF, JPG, PNG';
+            }
+        }
+
+        // Check file name for suspicious characters
+        const suspiciousPattern = /[<>:"/\\|?*\x00-\x1F]/;
+        if (suspiciousPattern.test(file.name)) {
+            return 'Nome file contiene caratteri non validi';
+        }
+
+        return null;
+    };
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'photo' | 'doc') => {
         const file = e.target.files?.[0];
         if (file) {
+            const validationError = validateFile(file, type);
+            if (validationError) {
+                toast({ 
+                    title: "Errore File", 
+                    description: validationError, 
+                    variant: "destructive" 
+                });
+                e.target.value = ''; // Clear input
+                return;
+            }
+
             if (type === 'photo') {
                 setSelectedPhotoFile(file);
                 // Create object URL for preview

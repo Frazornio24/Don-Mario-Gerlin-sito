@@ -1,16 +1,15 @@
-import { Download, FileText, Newspaper, TrendingUp } from "lucide-react";
+import { Download, FileText, Newspaper, TrendingUp, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogClose,
 } from "@/components/ui/dialog";
 
 /**
@@ -18,7 +17,7 @@ import {
  * Rassegna stampa e documenti
  */
 const Articoli = () => {
-  const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
+  const [selectedDocIndex, setSelectedDocIndex] = useState<number | null>(null);
   const [customDocs, setCustomDocs] = useState<any[]>([]);
 
   // Load custom docs from admin panel
@@ -201,6 +200,67 @@ const Articoli = () => {
     },
   ];
 
+  const handlePrev = useCallback(() => {
+    setSelectedDocIndex((prev) => {
+      if (prev === null) return null;
+      return prev === 0 ? documents.length - 1 : prev - 1;
+    });
+  }, [documents.length]);
+
+  const handleNext = useCallback(() => {
+    setSelectedDocIndex((prev) => {
+      if (prev === null) return null;
+      return prev === documents.length - 1 ? 0 : prev + 1;
+    });
+  }, [documents.length]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedDocIndex === null) return;
+      
+      if (e.key === "ArrowLeft") {
+        handlePrev();
+      } else if (e.key === "ArrowRight") {
+        handleNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedDocIndex, handleNext, handlePrev]);
+
+  // Swipe handlers
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      handleNext();
+    } else if (isRightSwipe) {
+      handlePrev();
+    }
+  };
+
+  const selectedDoc = selectedDocIndex !== null ? documents[selectedDocIndex] : null;
+
   return (
     <div className="min-h-screen">
       <SEO
@@ -242,7 +302,7 @@ const Articoli = () => {
               {documents.map((doc, index) => (
                 <div
                   key={index}
-                  onClick={() => setSelectedPdf(doc.url)}
+                  onClick={() => setSelectedDocIndex(index)}
                   className="p-8 rounded-3xl bg-card hover:shadow-elegant transition-all duration-500 
                            group border-2 border-border hover:border-secondary animate-scale-in cursor-pointer"
                   style={{ animationDelay: `${index * 100}ms` }}
@@ -325,17 +385,69 @@ const Articoli = () => {
       </main>
       <Footer />
 
-      <Dialog open={!!selectedPdf} onOpenChange={(open) => !open && setSelectedPdf(null)}>
-        <DialogContent className="max-w-4xl h-[80vh]">
-          <DialogHeader>
-            <DialogTitle>Anteprima Documento</DialogTitle>
-            <DialogDescription>
-              Visualizzazione anteprima del documento
-            </DialogDescription>
-          </DialogHeader>
-          {selectedPdf && (
-            <iframe src={selectedPdf} className="w-full h-full rounded-md" title="PDF Preview" />
-          )}
+      <Dialog open={selectedDocIndex !== null} onOpenChange={(open) => !open && setSelectedDocIndex(null)}>
+        <DialogContent 
+           className="max-w-7xl w-full h-[90vh] bg-background border-none shadow-2xl p-0 flex flex-col overflow-hidden [&>button]:hidden text-foreground"
+           onTouchStart={onTouchStart}
+           onTouchMove={onTouchMove}
+           onTouchEnd={onTouchEnd}
+        >
+          {/* Header/Close Bar */}
+          <div className="flex items-center justify-between p-4 border-b bg-muted/30">
+             <DialogTitle className="text-lg font-semibold truncate flex-1 pr-4">
+                {selectedDoc?.title}
+             </DialogTitle>
+             <div className="flex items-center gap-2">
+               {selectedDocIndex !== null && (
+                 <span className="text-sm text-muted-foreground mr-2">
+                   {selectedDocIndex + 1} / {documents.length}
+                 </span>
+               )}
+               <DialogClose className="rounded-full bg-muted hover:bg-muted/80 p-2 transition-colors">
+                  <X className="h-5 w-5" />
+                  <span className="sr-only">Close</span>
+               </DialogClose>
+             </div>
+          </div>
+
+          <div className="flex-1 relative bg-neutral-100 w-full h-full overflow-hidden">
+            {/* Left Button */}
+            <button
+               onClick={(e) => {
+                 e.stopPropagation();
+                 handlePrev();
+               }}
+               className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-10 
+                          bg-white/80 hover:bg-white shadow-md p-2 rounded-full 
+                          text-primary transition-all duration-300"
+               aria-label="Previous document"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+
+             {/* Right Button */}
+            <button
+               onClick={(e) => {
+                 e.stopPropagation();
+                 handleNext();
+               }}
+               className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-10 
+                          bg-white/80 hover:bg-white shadow-md p-2 rounded-full 
+                          text-primary transition-all duration-300"
+               aria-label="Next document"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+            
+            {/* PDF Viewer */}
+            {selectedDoc && (
+              <iframe 
+                src={selectedDoc.url} 
+                className="w-full h-full border-none" 
+                title={selectedDoc.title} 
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

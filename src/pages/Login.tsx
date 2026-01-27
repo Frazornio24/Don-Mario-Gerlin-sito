@@ -23,7 +23,6 @@ const Login = () => {
 
             if (error) throw error;
 
-            sessionStorage.setItem("isAdmin", "true"); // We can still use this for simple client-side checks, or rely on supabase.auth.getSession()
             navigate("/admin");
         } catch (error: any) {
             setError(error.message || "Credenziali non valide");
