@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
+import { useEffect } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -65,26 +66,42 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join("\n")}
-}
-`,
-          )
-          .join("\n"),
-      }}
-    />
-  );
+  useEffect(() => {
+    const styleId = `chart-style-${id}`;
+    let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+
+    const cssText = Object.entries(THEMES)
+      .map(
+        ([theme, prefix]) => {
+          const styles = colorConfig
+            .map(([key, itemConfig]) => {
+              const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+              return color ? `  --color-${key}: ${color};` : null;
+            })
+            .filter(Boolean)
+            .join('\n');
+          
+          return `${prefix} [data-chart="${id}"] {\n${styles}\n}`;
+        }
+      )
+      .join('\n');
+
+    styleElement.textContent = cssText;
+
+    return () => {
+      if (styleElement && styleElement.parentNode) {
+        styleElement.parentNode.removeChild(styleElement);
+      }
+    };
+  }, [id, config]);
+
+  return null;
 };
 
 const ChartTooltip = RechartsPrimitive.Tooltip;

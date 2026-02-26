@@ -38,14 +38,14 @@ const Contatti = () => {
     {
       icon: Phone,
       title: "Telefono",
-      content: "+39 0438 940249",
-      link: "tel:+390438940249",
+      content: "",
+      link: "",
     },
     {
       icon: Mail,
       title: "Email",
-      content: "info@donmariogerlin.org",
-      link: "mailto:info@donmariogerlin.org",
+      content: "",
+      link: "",
     },
   ];
 

@@ -3,6 +3,7 @@ import { Calendar } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import videoBrasile from "@/assets/donGerlinBrasile.mp4";
 
 /**
  * Don Mario Page
@@ -163,6 +164,56 @@ const DonMario = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Videos Section */}
+        <section className="py-20 md:py-32 bg-primary/5 relative overflow-hidden">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
+            <div className="text-center mb-16">
+              <h2 className="text-primary mb-6 animate-slide-up">Testimonianze Video</h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-slide-up">
+                Documentari e filmati storici che raccontano l'opera e la dedizione di Don Mario Gerlin.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-12">
+              {/* Local Video */}
+              <div className="rounded-2xl overflow-hidden shadow-elegant border-2 border-border bg-card flex flex-col">
+                <div className="relative w-full aspect-video bg-black/5">
+                  <video 
+                    controls
+                    className="absolute top-0 left-0 w-full h-full object-cover"
+                    src={videoBrasile}
+                  >
+                    Il tuo browser non supporta il tag video.
+                  </video>
+                </div>
+                <div className="p-6 flex-1 flex flex-col justify-center">
+                  <h3 className="text-xl font-bold text-primary mb-2">Video in Brasile</h3>
+                  <p className="text-muted-foreground">Un video storico che mostra l'opera e la vita di Don Mario Gerlin in Brasile.</p>
+                </div>
+              </div>
+
+              {/* YouTube Video */}
+              <div className="rounded-2xl overflow-hidden shadow-elegant border-2 border-border bg-card flex flex-col">
+                <div className="aspect-video relative w-full bg-black/5">
+                  <iframe 
+                    className="absolute top-0 left-0 w-full h-full border-none"
+                    src="https://www.youtube.com/embed/fZr9yVqLiXI?start=2597" 
+                    title="Documentario Don Mario Gerlin" 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerPolicy="strict-origin-when-cross-origin" 
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                <div className="p-6 flex-1 flex flex-col justify-center">
+                  <h3 className="text-xl font-bold text-primary mb-2">Premiazione Borsa di Studio al Toniolo</h3>
+                  <p className="text-muted-foreground">Consegna di una borsa di studio a uno studente per una tesi dedicata alla figura e all'opera di Don Mario Gerlin.</p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

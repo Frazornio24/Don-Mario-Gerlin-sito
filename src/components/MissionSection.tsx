@@ -73,47 +73,26 @@ const MissionSection = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Video Section */}
-          <div
-            className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
-              }`}
-          >
-            <div className="relative rounded-3xl overflow-hidden shadow-elegant hover:shadow-xl 
-                          transition-all duration-500 group border-4 border-secondary">
-              <div className="aspect-video bg-card">
-                <iframe
-                  src="https://www.youtube.com/embed/HBjk6zaeiPE?autoplay=0&mute=0&loop=0&controls=1&showinfo=1&modestbranding=0"
-                  title="Video Don Mario Gerlin"
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-              <div className="absolute inset-0 border-2 border-secondary/50 rounded-3xl 
-                            group-hover:border-secondary transition-all duration-500 pointer-events-none" />
-            </div>
-          </div>
-
+        <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
           {/* Mission Content */}
           <div
-            className={`transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+            className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
           >
             <h2 className="mb-6 text-primary">La Nostra Missione</h2>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+            <p className="text-lg text-muted-foreground mb-12 leading-relaxed">
               Continua l'opera di Don Mario attraverso progetti concreti che portano
               speranza e opportunità alle comunità che ne hanno più bisogno.
             </p>
 
             {/* Feature List */}
-            <div className="space-y-6 mb-10">
+            <div className="grid sm:grid-cols-2 gap-6 mb-12 text-left">
               {features.map((feature, index) => (
                 <Link
                   key={index}
                   to={feature.path}
-                  className={`flex items-start gap-4 p-5 rounded-2xl bg-card hover:bg-muted/50 
-                            transition-all duration-300 hover:shadow-md group block
+                  className={`flex flex-col sm:flex-row items-center sm:items-start gap-4 p-6 rounded-2xl bg-card hover:bg-muted/50 
+                            transition-all duration-300 hover:shadow-md group block border border-border
                             ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
                   style={{ transitionDelay: `${(index + 1) * 150}ms` }}
                 >
@@ -122,8 +101,8 @@ const MissionSection = () => {
                                 transition-transform duration-300 shadow-gold">
                     <feature.icon className="text-primary-foreground" size={24} />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-1 group-hover:text-secondary transition-colors">
+                  <div className="text-center sm:text-left">
+                    <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-secondary transition-colors">
                       {feature.title}
                     </h3>
                     <p className="text-muted-foreground">{feature.description}</p>

@@ -17,7 +17,7 @@ const Footer = () => {
   const socialLinks = [
     { icon: Facebook, label: "Facebook", url: "#" },
     { icon: Instagram, label: "Instagram", url: "#" },
-    { icon: Mail, label: "Email", url: "mailto:info@donmariogerlin.org" },
+    { icon: Mail, label: "Email", url: "#" },
   ];
 
   return (
@@ -65,21 +65,15 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3 text-primary-foreground/80">
                 <Phone size={20} className="text-secondary flex-shrink-0" />
-                <a
-                  href="tel:+390422123456"
-                  className="hover:text-secondary transition-colors duration-300"
-                >
-                  +39 0438 940249
-                </a>
+                <span className="text-primary-foreground/80">
+                  
+                </span>
               </li>
               <li className="flex items-center gap-3 text-primary-foreground/80">
                 <Mail size={20} className="text-secondary flex-shrink-0" />
-                <a
-                  href="mailto:info@donmariogerlin.org"
-                  className="hover:text-secondary transition-colors duration-300"
-                >
-                  info@donmariogerlin.org
-                </a>
+                <span className="text-primary-foreground/80">
+                  
+                </span>
               </li>
             </ul>
 
