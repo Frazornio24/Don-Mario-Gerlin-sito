@@ -1,20 +1,30 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import ScrollToTop from "./components/ScrollToTop";
+import { LoadingSpinner } from "./components/LazyLoad";
+
+// Pagine Pubbliche Statiche/Dinamiche
 import Index from "./pages/Index";
-import ChiSiamo from "./pages/ChiSiamo";
-import DonMario from "./pages/DonMario";
-import Bambui from "./pages/Bambui";
-import Articoli from "./pages/Articoli";
-import Foto from "./pages/Foto";
-import Contatti from "./pages/Contatti";
-import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
-import Admin from "./pages/Admin";
+const ChiSiamo = lazy(() => import("./pages/ChiSiamo"));
+const Progetti = lazy(() => import("./pages/Progetti"));
+const DonMario = lazy(() => import("./pages/DonMario"));
+const Bambui = lazy(() => import("./pages/Bambui"));
+const Articoli = lazy(() => import("./pages/Articoli"));
+const Foto = lazy(() => import("./pages/Foto"));
+const Eventi = lazy(() => import("./pages/Eventi"));
+const Collaborazioni = lazy(() => import("./pages/Collaborazioni"));
+const Contatti = lazy(() => import("./pages/Contatti"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Pannello di Amministrazione e Autenticazione
+import ProtectedRoute from "./components/ProtectedRoute";
+const AdminLogin = lazy(() => import("./pages/admin/Login"));
+const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 
 const queryClient = new QueryClient();
 
@@ -26,20 +36,31 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/chi-siamo" element={<ChiSiamo />} />
-            <Route path="/don-mario" element={<DonMario />} />
-            <Route path="/bambui" element={<Bambui />} />
-            <Route path="/articoli" element={<Articoli />} />
-            <Route path="/foto" element={<Foto />} />
-            <Route path="/contatti" element={<Contatti />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            {/* Admin Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              {/* Rotte Pubbliche */}
+              <Route path="/" element={<Index />} />
+              <Route path="/chi-siamo" element={<ChiSiamo />} />
+              <Route path="/progetti" element={<Progetti />} />
+              <Route path="/don-mario" element={<DonMario />} />
+              <Route path="/bambui" element={<Bambui />} />
+              <Route path="/articoli" element={<Articoli />} />
+              <Route path="/foto" element={<Foto />} />
+              <Route path="/eventi" element={<Eventi />} />
+              <Route path="/collaborazioni" element={<Collaborazioni />} />
+              <Route path="/contatti" element={<Contatti />} />
+
+              {/* Rotte Admin */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<ProtectedRoute />}>
+                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+              </Route>
+
+              {/* Rotta di fallback / 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </HelmetProvider>
@@ -47,3 +68,4 @@ const App = () => (
 );
 
 export default App;
+

@@ -2,9 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Image as ImageIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import HeroSection from "@/components/HeroSection";
+import galleryHero from "@/assets/gallery/missione/funzione religiosa in Brasile.jpg";
 import {
   Dialog,
   DialogContent,
@@ -28,37 +31,7 @@ const Foto = () => {
     { id: "persone", label: "Persone" },
   ];
 
-  // Funzione per caricare dinamicamente le foto dalla cartella assets/gallery
-  // Formato file atteso: category/filename.jpg
-  const loadGalleryImages = () => {
-    try {
-      // @ts-ignore - Vite specific feature
-      // Load all images recursively from subdirectories
-      const glob = import.meta.glob('@/assets/gallery/*/*.{png,jpg,jpeg,webp}', { eager: true });
-
-      return Object.entries(glob).map(([path, module]: [string, any]) => {
-        // path is like "/src/assets/gallery/category/filename.jpg"
-        const parts = path.split('/');
-        const filename = parts.pop()?.split('.')[0] || ""; // Remove extension
-        const folder = parts.pop(); // The folder name (category)
-
-        const category = folder?.toLowerCase() || "varie";
-        // Clean up caption: remove hyphens/underscores/extension
-        const caption = filename.replace(/[-_]/g, ' ');
-
-        return {
-          url: module.default,
-          caption: caption.charAt(0).toUpperCase() + caption.slice(1), // Capitalize
-          category: category
-        };
-      });
-    } catch (e) {
-      console.error("Error loading gallery images:", e);
-      return [];
-    }
-  };
-
-  const [customPhotos, setCustomPhotos] = useState<any[]>([]);
+  const [photos, setPhotos] = useState<any[]>([]);
 
   // Load custom photos from admin panel (Supabase)
   useEffect(() => {
@@ -69,22 +42,11 @@ const Foto = () => {
         .order('created_at', { ascending: false });
 
       if (data) {
-        setCustomPhotos(data);
+        setPhotos(data);
       }
     };
     fetchPhotos();
   }, []);
-
-  const dynamicPhotos = loadGalleryImages();
-
-  /* 
-   * Foto statiche rimosse come richiesto.
-   * Le foto vengono caricate solo dalla cartella assets/gallery (dynamicPhotos) 
-   * e dal database (customPhotos).
-   */
-
-  // Unisci foto dinamiche (file) e custom (admin)
-  const photos = [...dynamicPhotos, ...customPhotos];
 
 
   const filteredPhotos =
@@ -159,15 +121,11 @@ const Foto = () => {
       />
       <Header />
       <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-20 md:py-32 bg-gradient-to-br from-primary via-primary-light to-primary">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-primary-foreground mb-6 animate-slide-up">Galleria Fotografica</h1>
-            <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-3xl mx-auto animate-slide-up">
-              Immagini che raccontano la vita e l'opera di Don Mario Gerlin
-            </p>
-          </div>
-        </section>
+        <HeroSection
+          title="Galleria Fotografica"
+          subtitle="Immagini che raccontano la vita e l'opera di Don Mario Gerlin"
+          backgroundImage={galleryHero}
+        />
 
         {/* Filter Section */}
         <section className="py-12 bg-background border-b border-border">
@@ -193,38 +151,58 @@ const Foto = () => {
         {/* Gallery Section */}
         <section className="py-20 md:py-32 bg-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredPhotos.map((photo, index) => (
-                <div
-                  key={index}
-                  onClick={() => setSelectedPhotoIndex(index)}
-                  className="group relative rounded-3xl overflow-hidden shadow-elegant 
-                           hover:shadow-xl transition-all duration-500 border-4 border-secondary 
-                           hover:scale-105 cursor-pointer animate-scale-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="aspect-[4/3] bg-card">
-                    <img
-                      src={photo.url}
-                      alt={photo.caption}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent 
-                              opacity-0 group-hover:opacity-100 transition-all duration-500 
-                              flex items-end justify-center p-6"
+            <motion.div 
+              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
+              initial="hidden"
+              animate="show"
+              variants={{
+                hidden: { opacity: 0 },
+                show: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1,
+                  },
+                },
+              }}
+            >
+              <AnimatePresence>
+                {filteredPhotos.map((photo, index) => (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.4, type: "spring" }}
+                    key={photo.url || index}
+                    onClick={() => setSelectedPhotoIndex(index)}
+                    className="group relative rounded-3xl overflow-hidden shadow-elegant 
+                             hover:shadow-xl border-4 border-secondary 
+                             cursor-pointer"
                   >
-                    <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      <div className="flex items-center gap-3 text-primary-foreground">
-                        <ImageIcon size={24} />
-                        <p className="font-semibold text-lg">{photo.caption}</p>
+                    <div className="aspect-[4/3] bg-card">
+                      <img
+                        src={photo.url}
+                        alt={photo.caption}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent 
+                                opacity-0 group-hover:opacity-100 transition-all duration-500 
+                                flex items-end justify-center p-6"
+                    >
+                      <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <div className="flex items-center gap-3 text-primary-foreground">
+                          <ImageIcon size={24} />
+                          <p className="font-semibold text-lg">{photo.caption}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
 
             {filteredPhotos.length === 0 && (
               <div className="text-center py-20">

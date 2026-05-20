@@ -1,40 +1,17 @@
-import { useState, useEffect, useRef } from "react";
 import { BookOpen, Heart, Users, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import heroImage from "@/assets/hero2.jpg";
+import { SectionTitle } from "@/components/ui/SectionTitle";
+import { FadeInView } from "@/components/ui/FadeInView";
 
 /**
  * Chi Siamo Page
  * Storia e missione dell'associazione
  */
 const ChiSiamo = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
   const values = [
     {
       icon: Heart,
@@ -93,7 +70,7 @@ const ChiSiamo = () => {
         </section>
 
         {/* Story Section */}
-        <section ref={sectionRef} className="py-20 md:py-32 bg-background relative overflow-hidden">
+        <section className="py-20 md:py-32 bg-background relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
             <svg className="w-full h-full" width="100%" height="100%">
@@ -107,35 +84,31 @@ const ChiSiamo = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center mb-24">
               {/* Text Content */}
-              <div
-                className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
-                  }`}
-              >
-                <h2 className="text-3xl md:text-4xl font-bold text-primary mb-8 leading-tight">
-                  Una storia di fede e <span className="text-secondary">dedizione</span>
-                </h2>
-                <div className="prose prose-lg text-muted-foreground">
-                  <p className="mb-6 leading-relaxed">
-                    <span className="text-5xl float-left mr-3 mt-[-8px] font-serif text-secondary opacity-80">F</span>
-                    ondata nel <strong>giugno 1994</strong>, l'Associazione Amici di Don Mario Gerlin
-                    nasce con uno scopo nobile: preservare e diffondere l'opera del missionario trevigiano.
-                    Una figura che ha segnato profondamente chiunque lo abbia incontrato, testimone autentico di
-                    fede incrollabile, impegno sociale attivo e amore smisurato per gli ultimi.
-                  </p>
-                  <p className="leading-relaxed">
-                    Don Mario Gerlin, nato a Pieve di Soligo, non è stato solo un sacerdote, ma un uomo poliedrico:
-                    educatore appassionato, sindaco amato della sua città negli anni '60, e infine missionario
-                    in Brasile. Lì, a Bambuí, ha donato tutto se stesso per i malati di lebbra, diventando
-                    un faro di speranza in una realtà di emarginazione.
-                  </p>
+              <FadeInView direction="left" delay={0.1}>
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-primary mb-8 leading-tight font-display">
+                    Una storia di fede e <span className="text-secondary font-display">dedizione</span>
+                  </h2>
+                  <div className="prose prose-lg text-muted-foreground">
+                    <p className="mb-6 leading-relaxed">
+                      <span className="text-5xl float-left mr-3 mt-[-8px] font-serif text-secondary opacity-80">F</span>
+                      ondata nel <strong>giugno 1994</strong>, l'Associazione Amici di Don Mario Gerlin
+                      nasce con uno scopo nobile: preservare e diffondere l'opera del missionario trevigiano.
+                      Una figura che ha segnato profondamente chiunque lo abbia incontrato, testimone autentico di
+                      fede incrollabile, impegno sociale attivo e amore smisurato per gli ultimi.
+                    </p>
+                    <p className="leading-relaxed">
+                      Don Mario Gerlin, nato a Pieve di Soligo, non è stato solo un sacerdote, ma un uomo poliedrico:
+                      educatore appassionato, sindaco amato della sua città negli anni '60, e infine missionario
+                      in Brasile. Lì, a Bambuí, ha donato tutto se stesso per i malati di lebbra, diventando
+                      un faro di speranza in una realtà di emarginazione.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </FadeInView>
 
               {/* Image */}
-              <div
-                className={`transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
-                  }`}
-              >
+              <FadeInView direction="right" delay={0.2}>
                 <div className="relative group">
                   <div className="absolute -inset-4 bg-gradient-to-tr from-secondary/20 to-primary/20 rounded-[2rem] blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/50">
@@ -147,66 +120,70 @@ const ChiSiamo = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
                   </div>
                 </div>
-              </div>
+              </FadeInView>
             </div>
 
             {/* Values Section */}
             <div className="mb-24">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl font-bold text-primary mb-4">I Nostri Valori</h2>
-                <div className="w-24 h-1 bg-secondary mx-auto rounded-full" />
-              </div>
+              <FadeInView delay={0.1}>
+                <SectionTitle
+                  title="I Nostri Valori"
+                  subtitle="I principi che guidano ogni nostra azione quotidiana"
+                  label="Fondamenta"
+                />
+              </FadeInView>
 
               <div className="grid md:grid-cols-3 gap-8">
                 {values.map((value, index) => (
-                  <div
-                    key={index}
-                    className={`p-8 rounded-3xl bg-card border border-border hover:border-secondary/50 
-                              hover:shadow-elegant transition-all duration-500 group text-center
-                              ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-                    style={{ transitionDelay: `${index * 150}ms` }}
-                  >
-                    <div className="w-16 h-16 mx-auto mb-6 rounded-2xl gradient-gold shadow-gold 
-                                  flex items-center justify-center group-hover:scale-110 
-                                  transition-transform duration-300 transform rotate-3 group-hover:rotate-0">
-                      <value.icon className="text-primary-foreground" size={32} />
+                  <FadeInView key={index} delay={index * 0.15}>
+                    <div
+                      className="p-8 rounded-3xl card-premium group text-center h-full cursor-pointer"
+                    >
+                      <div className="w-16 h-16 mx-auto mb-6 rounded-2xl gradient-gold shadow-gold 
+                                    flex items-center justify-center group-hover:scale-110 
+                                    transition-transform duration-300 transform rotate-3 group-hover:rotate-0">
+                        <value.icon className="text-primary-foreground" size={32} />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground mb-3">{value.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed">{value.description}</p>
                     </div>
-                    <h3 className="text-xl font-bold text-foreground mb-3">{value.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">{value.description}</p>
-                  </div>
+                  </FadeInView>
                 ))}
               </div>
             </div>
 
             {/* Links Section */}
             <div>
-              <div className="text-center mb-12">
-                <h2 className="text-2xl font-bold text-primary mb-4">Approfondisci</h2>
-                <p className="text-muted-foreground">Scopri di più sulla nostra attività</p>
-              </div>
+              <FadeInView delay={0.1}>
+                <SectionTitle
+                  title="Approfondisci"
+                  subtitle="Scopri di più sulla nostra attività"
+                  label="Scopri"
+                />
+              </FadeInView>
               <div className="max-w-2xl mx-auto">
                 {features.map((feature, index) => (
-                  <Link
-                    key={index}
-                    to={feature.path}
-                    className="flex items-center gap-6 p-6 rounded-3xl bg-white shadow-sm border border-border/50
-                              hover:shadow-elegant hover:border-secondary transition-all duration-300 group"
-                  >
-                    <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-secondary/10 text-secondary
-                                  flex items-center justify-center group-hover:bg-secondary group-hover:text-white
-                                  transition-all duration-300">
-                      <feature.icon size={32} />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-secondary transition-colors">
-                        {feature.title}
-                      </h3>
-                      <p className="text-muted-foreground">{feature.description}</p>
-                    </div>
-                    <div className="ml-auto text-secondary opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
-                      →
-                    </div>
-                  </Link>
+                  <FadeInView key={index} delay={0.2}>
+                    <Link
+                      to={feature.path}
+                      className="flex items-center gap-6 p-6 card-premium group block cursor-pointer"
+                    >
+                      <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-secondary/10 text-secondary
+                                    flex items-center justify-center group-hover:bg-secondary group-hover:text-white
+                                    transition-all duration-300">
+                        <feature.icon size={32} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-secondary transition-colors">
+                          {feature.title}
+                        </h3>
+                        <p className="text-muted-foreground">{feature.description}</p>
+                      </div>
+                      <div className="ml-auto text-secondary opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
+                        →
+                      </div>
+                    </Link>
+                  </FadeInView>
                 ))}
               </div>
             </div>

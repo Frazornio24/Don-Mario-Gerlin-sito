@@ -5,6 +5,10 @@ import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import HeroSection from "@/components/HeroSection";
+import hero3Img from "@/assets/hero3.jpg";
+import { SectionTitle } from "@/components/ui/SectionTitle";
+import { FadeInView } from "@/components/ui/FadeInView";
 import {
   Dialog,
   DialogContent,
@@ -17,11 +21,11 @@ import {
  * Rassegna stampa e documenti
  */
 const Articoli = () => {
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [articles, setArticles] = useState<any[]>([]);
   const [selectedDocIndex, setSelectedDocIndex] = useState<number | null>(null);
-  const [customDocs, setCustomDocs] = useState<any[]>([]);
 
-  // Load custom docs from admin panel
-  // Load custom docs from Supabase
+  // Load custom docs and online articles from Supabase
   useEffect(() => {
     const fetchDocs = async () => {
       const { data } = await supabase
@@ -33,172 +37,26 @@ const Articoli = () => {
         const mapped = data.map((d) => ({
           ...d,
           icon: FileText,
-          size: "Documento Caricato"
+          size: "Documento PDF"
         }));
-        setCustomDocs(mapped);
+        setDocuments(mapped);
       }
     };
+
+    const fetchArticles = async () => {
+      const { data } = await supabase
+        .from('online_articles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        setArticles(data);
+      }
+    };
+
     fetchDocs();
+    fetchArticles();
   }, []);
-
-  const staticDocuments = [
-    {
-      icon: Newspaper,
-      title: "Don Gerlin Nelle Scuole",
-      description: "Articolo da 'L'Azione' (2019)",
-      size: "312 KB - PDF",
-      url: "/documents/2019DonGerlinNelleScuoleAzione.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "Premio Toniolo - Gazzettino",
-      description: "Articolo da 'Il Gazzettino' (2019)",
-      size: "89 KB - PDF",
-      url: "/documents/2019PremioTonioloGazzettino.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "Premio Toniolo - Tribuna",
-      description: "Articolo da 'La Tribuna' (2019)",
-      size: "180 KB - PDF",
-      url: "/documents/2019PremioTonioloTribuna.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "Articolo Bracelli",
-      description: "Archivio 2018",
-      size: "144 KB - PDF",
-      url: "/documents/2018bracelli.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "L'Azione",
-      description: "Archivio 2013",
-      size: "408 KB - PDF",
-      url: "/documents/2013lazione.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "L'Azione",
-      description: "Archivio 2010",
-      size: "348 KB - PDF",
-      url: "/documents/2010lazione.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "Monte Calvario",
-      description: "Archivio 2010",
-      size: "656 KB - PDF",
-      url: "/documents/2010montecalvario.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "La Nostra Pieve",
-      description: "Archivio 2009",
-      size: "1.0 MB - PDF",
-      url: "/documents/2009lanostrapieve.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "La Sorgente",
-      description: "Archivio 2002",
-      size: "815 KB - PDF",
-      url: "/documents/2002lasorgente.pdf",
-    },
-    {
-      icon: Newspaper,
-      title: "Mosaico",
-      description: "Archivio 1965",
-      size: "814 KB - PDF",
-      url: "/documents/1965mosaico.pdf",
-    },
-  ];
-
-  const documents = [...customDocs, ...staticDocuments];
-
-  const articles = [
-    {
-      source: "QdP News",
-      date: "27 Febbraio 2023",
-      title: "30° Anniversario della Morte",
-      description:
-        "\"Italia e Brasile uniti nel ricordo di Don Mario Gerlin - Messa solenne con il Vescovo nell'Arcipretale diventata Duomo\"",
-      tags: ["Commemorazione", "Trentennale"],
-      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/italia-e-brasile-uniti-nel-trentennale-della-morte-di-don-mario-gerlin-messa-con-il-vescovo-nellarcipretale-diventata-duomo-20-anni-fa/",
-    },
-    {
-      source: "Treviso Today",
-      date: "15 Settembre 2022",
-      title: "Borse di Studio Internazionali",
-      description:
-        "\"Gemellaggio educativo tra Pieve di Soligo e Bambuí: nuove opportunità per gli studenti grazie all'eredità di Don Mario\"",
-      tags: ["Educazione", "Gemellaggio"],
-      url: "https://www.trevisotoday.it/scuola/borse-studio-gemellaggio-don-mario-gerlin-pieve-di-soligo-.html",
-    },
-    {
-      source: "QdP News",
-      date: "27 Ottobre 2022",
-      title: "103° Anniversario della Nascita",
-      description:
-        "\"Celebrazioni internazionali per Don Mario Gerlin con ospiti d'eccezione: soprano giapponese dalla Fenice di Venezia\"",
-      tags: ["Anniversario", "Musica"],
-      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/103-anni-fa-nasceva-don-mario-gerlin-domani-sera-in-duomo-la-messa-in-suo-ricordo-ospite-deccezione-un-soprano-giapponese-dalla-fenice-di-venezia/",
-    },
-    {
-      source: "QdP News",
-      date: "2 Aprile 2022",
-      title: "Assemblea Annuale Associazione",
-      description:
-        "\"Sabato 2 Aprile l'Assemblea annuale dell'Associazione Amici di Don Mario Gerlin: bilancio e nuovi progetti\"",
-      tags: ["Associazione", "Assemblea"],
-      url: "https://www.qdpnews.it/notizie-in-breve/02-04-sabato-2-aprile-lassemblea-annuale-dellassociazione-amici-di-don-mario-gerlin/",
-    },
-    {
-      source: "QdP News",
-      date: "28 Marzo 2022",
-      title: "Ricordo di Adriano Armelin",
-      description:
-        "\"Il commosso ricordo degli Amici di Don Mario Gerlin per Adriano Armelin: una vita dedicata al servizio\"",
-      tags: ["Memoria", "Servizio"],
-      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/martedi-alle-15-in-duomo-a-pieve-di-soligo-i-funerali-di-adriano-armelin-il-commosso-ricordo-degli-amici-di-don-mario-gerlin/",
-    },
-    {
-      source: "Treviso Today",
-      date: "24 Febbraio 2021",
-      title: "Nuova Presidenza Associazione",
-      description:
-        "\"Pierina Gerlin eletta nuova presidente dell'Associazione Amici di Don Mario Gerlin: continuità e innovazione\"",
-      tags: ["Associazione", "Nomina"],
-      url: "https://www.trevisotoday.it/info/amici-don-mario-gerlin-presidente-pieve-di-soligo-24-febbraio-2021.html",
-    },
-    {
-      source: "QdP News",
-      date: "27 Ottobre 2021",
-      title: "Messa in Ricordo di Don Mario",
-      description:
-        "\"Santa Messa in Duomo a Pieve di Soligo in ricordo di Don Mario Gerlin con la Piccola Orchestra Veneta\"",
-      tags: ["Memoria", "Anniversario"],
-      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/pieve-di-soligo-domani-in-duomo-la-santa-messa-in-ricordo-di-don-mario-gerlin-intervento-musicale-della-piccola-orchestra-veneta/",
-    },
-    {
-      source: "QdP News",
-      date: "5 Giugno 2021",
-      title: "Testimonianze per Francesco Fabbri",
-      description:
-        "\"Tante testimonianze per Francesco Fabbri: un esempio illustre di amore per la comunità e servizio al bene comune\"",
-      tags: ["Comunità", "Servizio"],
-      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/pieve-di-soligo-tante-testimonianze-per-francesco-fabbri-zabotti-esempio-illustre-di-amore-per-la-comunita-e-servizio-al-bene-comune/",
-    },
-    {
-      source: "QdP News",
-      date: "26 Febbraio 2021",
-      title: "Messa in Memoria",
-      description:
-        "\"Messa in memoria di Don Mario Gerlin: ricordate anche le preziose collaboratrici suor Carmela e suor Alberta\"",
-      tags: ["Memoria", "Collaborazione"],
-      url: "https://www.qdpnews.it/comuni/pieve-di-soligo/pieve-di-soligo-questa-sera-in-duomo-la-messa-in-memoria-di-don-mario-gerlin-saranno-ricordate-anche-le-collaboratrici-suor-carmela-e-suor-alberta/",
-    },
-  ];
 
   const handlePrev = useCallback(() => {
     setSelectedDocIndex((prev) => {
@@ -269,15 +127,11 @@ const Articoli = () => {
       />
       <Header />
       <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-20 md:py-32 bg-gradient-to-br from-primary via-primary-light to-primary">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-primary-foreground mb-6 animate-slide-up">Articoli e Documenti</h1>
-            <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-3xl mx-auto animate-slide-up">
-              L'eredità di Don Mario attraverso i media e la documentazione storica
-            </p>
-          </div>
-        </section>
+        <HeroSection
+          title="Articoli e Documenti"
+          subtitle="L'eredità di Don Mario attraverso i media e la documentazione storica"
+          backgroundImage={hero3Img}
+        />
 
         {/* Documents Section */}
         <section className="py-20 md:py-32 bg-background relative overflow-hidden">

@@ -12,7 +12,7 @@ interface LazyComponentProps {
 // Specific lazy components for heavy pages
 export const LazyFoto = lazy(() => import('@/pages/Foto').then(module => ({ default: module.default })));
 export const LazyArticoli = lazy(() => import('@/pages/Articoli').then(module => ({ default: module.default })));
-export const LazyAdmin = lazy(() => import('@/pages/Admin').then(module => ({ default: module.default })));
+
 
 export const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center">

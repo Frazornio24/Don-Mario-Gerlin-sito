@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 
 /**
  * Header Component
@@ -25,27 +26,39 @@ const Header = () => {
   const menuItems = [
     { label: "Home", path: "/" },
     { label: "Chi Siamo", path: "/chi-siamo" },
+    { label: "Progetti", path: "/progetti" },
     { label: "Don Mario", path: "/don-mario" },
     { label: "Bambui", path: "/bambui" },
     { label: "Articoli", path: "/articoli" },
     { label: "Foto", path: "/foto" },
+    { label: "Eventi", path: "/eventi" },
+    { label: "Collaborazioni", path: "/collaborazioni" },
     { label: "Contatti", path: "/contatti" },
   ];
 
   return (
-    <header
-      className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled
-        ? "bg-primary/95 backdrop-blur-xl shadow-lg border-b border-secondary/20"
-        : "bg-primary/85 backdrop-blur-md border-b border-secondary/10"
-        }`}
+    <motion.header
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+        isScrolled ? "shadow-lg border-b border-secondary/30" : "border-b border-secondary/15"
+      }`}
+      style={{
+        background: isScrolled
+          ? "linear-gradient(90deg, rgba(10, 21, 36, 0.98) 0%, rgba(18, 40, 70, 0.98) 50%, rgba(10, 21, 36, 0.98) 100%)"
+          : "linear-gradient(90deg, rgba(14, 30, 51, 0.95) 0%, rgba(26, 55, 92, 0.95) 50%, rgba(14, 30, 51, 0.95) 100%)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+      }}
     >
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24">
+        <div className={`flex items-center justify-between ${isScrolled ? "h-20" : "h-24"} transition-all duration-500`}>
           {/* Logo */}
           <Link
             to="/"
-            className="text-3xl md:text-4xl font-black text-secondary
-                     hover:scale-105 hover:brightness-110 transition-all duration-300 z-50"
+            className="text-2xl md:text-3xl font-black text-secondary
+                     hover:scale-105 hover:brightness-110 transition-all duration-300 z-50 font-display"
             style={{
               textShadow: "0 2px 8px rgba(201, 150, 50, 0.3)"
             }}
@@ -54,22 +67,23 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <ul className="hidden lg:flex items-center space-x-2">
+          <ul className="hidden xl:flex items-center space-x-6">
             {menuItems.map((item) => (
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`px-6 py-3 rounded-xl text-lg font-bold transition-all duration-300
+                  className={`px-1 py-2 text-sm xl:text-base font-semibold whitespace-nowrap transition-all duration-300 relative group
                     ${location.pathname === item.path
-                      ? "bg-secondary/15 text-secondary"
-                      : "text-primary-foreground hover:bg-secondary/10 hover:text-secondary"
-                    }
-                    hover:-translate-y-0.5`}
+                      ? "text-secondary"
+                      : "text-primary-foreground hover:text-secondary"
+                    }`}
                   style={{
-                    textShadow: "0 1px 4px rgba(0, 0, 0, 0.5)"
+                    textShadow: "0 1px 4px rgba(0, 0, 0, 0.4)"
                   }}
                 >
                   {item.label}
+                  <span className={`absolute bottom-0 left-0 h-[2px] bg-secondary transition-all duration-300
+                    ${location.pathname === item.path ? "w-full" : "w-0 group-hover:w-full"}`} />
                 </Link>
               </li>
             ))}
@@ -78,7 +92,7 @@ const Header = () => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-3 rounded-lg text-primary-foreground hover:bg-secondary/10 
+            className="xl:hidden p-3 rounded-lg text-primary-foreground hover:bg-secondary/10 
                      transition-colors duration-300 z-50"
             aria-label="Toggle menu"
           >
@@ -88,7 +102,7 @@ const Header = () => {
 
         {/* Mobile Navigation - Polished Solid Blue Dropdown */}
         <div
-          className={`lg:hidden absolute left-0 right-0 top-24 bg-primary transition-all duration-300 shadow-2xl overflow-hidden ${isMenuOpen
+          className={`xl:hidden absolute left-0 right-0 top-24 bg-primary transition-all duration-300 shadow-2xl overflow-hidden ${isMenuOpen
             ? "max-h-[80vh] opacity-100 translate-y-0"
             : "max-h-0 opacity-0 -translate-y-4 pointer-events-none"
             }`}
@@ -121,7 +135,7 @@ const Header = () => {
           </ul>
         </div>
       </nav>
-    </header>
+    </motion.header>
   );
 };
 

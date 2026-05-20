@@ -14,6 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      pagine: {
+        Row: {
+          id: string
+          slug: string
+          titolo: string
+          meta_descrizione: string | null
+          aggiornato_il: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          titolo: string
+          meta_descrizione?: string | null
+          aggiornato_il?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          titolo?: string
+          meta_descrizione?: string | null
+          aggiornato_il?: string
+        }
+        Relationships: []
+      }
+      sezioni: {
+        Row: {
+          id: string
+          pagina_slug: string | null
+          tipo: string
+          ordine: number
+          contenuto: any
+          contenuto_bozza: any
+          visibile: boolean
+          creato_il: string
+        }
+        Insert: {
+          id?: string
+          pagina_slug?: string | null
+          tipo: string
+          ordine: number
+          contenuto?: any
+          contenuto_bozza?: any
+          visibile?: boolean
+          creato_il?: string
+        }
+        Update: {
+          id?: string
+          pagina_slug?: string | null
+          tipo?: string
+          ordine?: number
+          contenuto?: any
+          contenuto_bozza?: any
+          visibile?: boolean
+          creato_il?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sezioni_pagina_slug_fkey"
+            columns: ["pagina_slug"]
+            isOneToOne: false
+            referencedRelation: "pagine"
+            referencedColumns: ["slug"]
+          }
+        ]
+      }
+      media: {
+        Row: {
+          id: string
+          nome: string
+          url: string
+          tipo: string | null
+          caricato_il: string
+        }
+        Insert: {
+          id?: string
+          nome: string
+          url: string
+          tipo?: string | null
+          caricato_il?: string
+        }
+        Update: {
+          id?: string
+          nome?: string
+          url?: string
+          tipo?: string | null
+          caricato_il?: string
+        }
+        Relationships: []
+      }
       photos: {
         Row: {
           id: string
@@ -59,6 +148,96 @@ export type Database = {
           title?: string
           description?: string
           url?: string
+        }
+        Relationships: []
+      }
+      online_articles: {
+        Row: {
+          id: string
+          created_at: string
+          source: string
+          date: string
+          title: string
+          description: string
+          tags: string[]
+          url: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          source: string
+          date: string
+          title: string
+          description: string
+          tags?: string[]
+          url: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          source?: string
+          date?: string
+          title?: string
+          description?: string
+          tags?: string[]
+          url?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          id: string
+          created_at: string
+          title: string
+          description: string
+          date: string | null
+          attachment_url: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          title: string
+          description: string
+          date?: string | null
+          attachment_url?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          title?: string
+          description?: string
+          date?: string | null
+          attachment_url?: string | null
+        }
+        Relationships: []
+      }
+      collaborations: {
+        Row: {
+          id: string
+          created_at: string
+          title: string
+          description: string
+          url: string
+          image_url: string | null
+          attachment_url: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          title: string
+          description: string
+          url: string
+          image_url?: string | null
+          attachment_url?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          title?: string
+          description?: string
+          url?: string
+          image_url?: string | null
+          attachment_url?: string | null
         }
         Relationships: []
       }

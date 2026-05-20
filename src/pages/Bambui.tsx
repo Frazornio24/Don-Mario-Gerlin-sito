@@ -5,6 +5,9 @@ import Footer from "@/components/Footer";
 import ScuolaElementare from "@/assets/scuola.jpg";
 import Ospedale from "@/assets/ospedale.jpg";
 import SEO from "@/components/SEO";
+import HeroSection from "@/components/HeroSection";
+import { SectionTitle } from "@/components/ui/SectionTitle";
+import { FadeInView } from "@/components/ui/FadeInView";
 
 /**
  * Bambui Page
@@ -74,44 +77,49 @@ const Bambui = () => {
       />
       <Header />
       <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-20 md:py-32 bg-gradient-to-br from-primary via-primary-light to-primary">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-primary-foreground mb-6 animate-slide-up">Bambui</h1>
-            <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-3xl mx-auto animate-slide-up">
-              Il cuore della missione brasiliana
-            </p>
-          </div>
-        </section>
+        <HeroSection
+          title="Bambui"
+          subtitle="Il cuore della missione brasiliana"
+          backgroundImage={Ospedale}
+        />
 
         {/* Gallery Section */}
-        <section className="py-16 bg-muted/30">
+        <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="group relative rounded-3xl overflow-hidden shadow-elegant hover:shadow-xl transition-all duration-500 border-4 border-secondary">
-                <div className="aspect-[4/3] bg-card">
-                  <img
-                    src={ScuolaElementare}
-                    alt="Scuola a Bambui"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+              <FadeInView direction="left" delay={0.1}>
+                <div className="group relative rounded-3xl overflow-hidden card-premium border-4 border-secondary">
+                  <div className="aspect-[4/3] bg-card">
+                    <img
+                      src={ScuolaElementare}
+                      alt="Scuola a Bambui"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/90 to-transparent p-6">
+                    <p className="text-primary-foreground font-semibold text-lg font-display">Scuola elementare</p>
+                  </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/90 to-transparent p-6">
-                  <p className="text-primary-foreground font-semibold text-lg">Scuola elementare</p>
+              </FadeInView>
+
+              <FadeInView direction="right" delay={0.2}>
+                <div className="group relative rounded-3xl overflow-hidden card-premium border-4 border-secondary">
+                  <div className="aspect-[4/3] bg-card">
+                    <img
+                      src={Ospedale}
+                      alt="Ospedale"
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/90 to-transparent p-6">
+                    <p className="text-primary-foreground font-semibold text-lg font-display">Struttura ospedaliera</p>
+                  </div>
                 </div>
-              </div>
-              <div className="group relative rounded-3xl overflow-hidden shadow-elegant hover:shadow-xl transition-all duration-500 border-4 border-secondary">
-                <div className="aspect-[4/3] bg-card">
-                  <img
-                    src={Ospedale}
-                    alt="Ospedale"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/90 to-transparent p-6">
-                  <p className="text-primary-foreground font-semibold text-lg">Struttura ospedaliera</p>
-                </div>
-              </div>
+              </FadeInView>
             </div>
           </div>
         </section>

@@ -1,0 +1,27 @@
+name: Keep Supabase Awake
+
+on:
+  schedule:
+    # Esegui ogni 3 giorni a mezzanotte (UTC)
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Permette di eseguirla anche manualmente
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database
+        run: |
+          # Fai una richiesta GET alla tabella pubblica 'articoli' o 'photos' 
+          # chiedendo solo 1 elemento e 1 colonna per minimizzare il traffico dati
+          curl -s -X GET "${{ secrets.VITE_SUPABASE_URL }}/rest/v1/photos?select=id&limit=1" \
+          -H "apikey: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}" > /dev/null
+          
+          # Verifica che la chiamata abbia avuto successo
+          if [ $? -eq 0 ]; then
+            echo "Ping a Supabase effettuato con successo!"
+          else
+            echo "Errore durante il ping a Supabase."
+            exit 1
+          fi

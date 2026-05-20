@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, Phone, Mail, Send } from "lucide-react";
+import { MapPin, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import HeroSection from "@/components/HeroSection";
+import contattiHero from "@/assets/hero2.jpg";
 
 /**
  * Contatti Page
@@ -36,16 +38,10 @@ const Contatti = () => {
       content: "Piazza Libertà, 7\n31050 Solighetto (TV)",
     },
     {
-      icon: Phone,
-      title: "Telefono",
-      content: "",
-      link: "",
-    },
-    {
       icon: Mail,
       title: "Email",
-      content: "",
-      link: "",
+      content: "donmariogerlin@gmail.com",
+      link: "mailto:donmariogerlin@gmail.com",
     },
   ];
 
@@ -57,15 +53,11 @@ const Contatti = () => {
       />
       <Header />
       <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-20 md:py-32 bg-gradient-to-br from-primary via-primary-light to-primary">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-primary-foreground mb-6 animate-slide-up">Contatti</h1>
-            <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-3xl mx-auto animate-slide-up">
-              Siamo qui per rispondere alle tue domande
-            </p>
-          </div>
-        </section>
+        <HeroSection
+          title="Contatti"
+          subtitle="Siamo qui per rispondere alle tue domande"
+          backgroundImage={contattiHero}
+        />
 
         {/* Content Section */}
         <section className="py-20 md:py-32 bg-background relative overflow-hidden">
