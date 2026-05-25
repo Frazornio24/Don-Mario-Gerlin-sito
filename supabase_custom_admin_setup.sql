@@ -149,9 +149,9 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 3. Seed per Collaborazioni
 INSERT INTO public.collaborations (title, description, url) VALUES
-('Casa de repouso', 'Scopri le novità e le attività dalla casa di riposo in Brasile.', 'https://www.facebook.com/share/1DB17ogw3J/'),
-('Ospedale Don Mario Gerlin', 'Aggiornamenti e informazioni sulle attività sanitarie del nostro ospedale.', 'https://www.facebook.com/share/1BgUcLXJta/'),
-('Scuola Elementare', 'Scopri le iniziative e i progetti educativi per i bambini della nostra scuola.', 'https://www.facebook.com/share/17x1euKRzC/')
+('Asilo Nido', 'Scopri le attività educative e i progetti di accoglienza per i bambini dell''asilo nido in Brasile.', 'https://www.facebook.com/share/1DB17ogw3J/'),
+('Scuola Elementare', 'Scopri le iniziative, le lezioni e i progetti didattici dedicati ai bambini della scuola elementare in Brasile.', 'https://www.facebook.com/share/1BgUcLXJta/'),
+('Associazione San Francesco d''Assisi', 'Segui le attività di solidarietà e i progetti di assistenza dell''Associazione Sociale San Francesco d''Assisi a Bambuí.', 'https://www.facebook.com/share/17x1euKRzC/')
 ON CONFLICT (id) DO NOTHING;
 
 -- 4. Seed per Photos (Galleria Fotografica)

@@ -102,27 +102,32 @@ const Header = () => {
 
         {/* Mobile Navigation - Polished Solid Blue Dropdown */}
         <div
-          className={`xl:hidden absolute left-0 right-0 top-24 bg-primary transition-all duration-300 shadow-2xl overflow-hidden ${isMenuOpen
-            ? "max-h-[80vh] opacity-100 translate-y-0"
-            : "max-h-0 opacity-0 -translate-y-4 pointer-events-none"
+          className={`xl:hidden absolute left-0 right-0 top-full transition-all duration-300 shadow-2xl border-b border-secondary/20 ${isMenuOpen
+            ? "max-h-[calc(100vh-6rem)] opacity-100 translate-y-0 overflow-y-auto"
+            : "max-h-0 opacity-0 -translate-y-4 pointer-events-none overflow-hidden"
             }`}
+          style={{
+            background: "linear-gradient(180deg, rgba(10, 21, 36, 0.98) 0%, rgba(18, 40, 70, 0.98) 100%)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+          }}
         >
-          <ul className="flex flex-col py-6 px-6 space-y-2">
+          <ul className="flex flex-col py-4 px-6 space-y-1.5">
             {menuItems.map((item, index) => (
               <li
                 key={item.path}
                 className="w-full"
                 style={{
-                  transitionDelay: isMenuOpen ? `${index * 40}ms` : "0ms",
+                  transitionDelay: isMenuOpen ? `${index * 30}ms` : "0ms",
                   transform: isMenuOpen ? "translateX(0)" : "translateX(-10px)",
                   opacity: isMenuOpen ? 1 : 0,
-                  transition: "all 0.3s ease-out"
+                  transition: "all 0.25s ease-out"
                 }}
               >
                 <Link
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block px-6 py-4 rounded-xl text-xl font-bold transition-all duration-300
+                  className={`block px-6 py-3 rounded-xl text-lg font-bold transition-all duration-300
                     ${location.pathname === item.path
                       ? "bg-secondary text-primary shadow-md"
                       : "text-primary-foreground hover:bg-secondary/10 hover:text-secondary"
